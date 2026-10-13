@@ -1,0 +1,782 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WORD QUEST - 마법 학교 대탈출!</title>
+<style>
+:root {
+  --purple:#8557eb;
+  --pink:#ff73b5;
+  --yellow:#ffd455;
+  --mint:#65dfbc;
+  --blue:#6dbaff;
+  --ink:#39315e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Trebuchet MS","Malgun Gothic",sans-serif;
+  color:var(--ink);
+  min-height:100vh;
+  background:linear-gradient(135deg,#ffe0ef,#e4dcff 48%,#cdf7f0);
+}
+button{font:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid #f9b82d;outline-offset:3px}
+.app{max-width:860px;margin:auto;padding:20px 15px 50px}
+.top{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;flex-wrap:wrap;margin-bottom:18px
+}
+.logo{
+  color:#7543db;font-size:25px;font-weight:1000;
+  text-shadow:2px 2px white
+}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.pill{
+  background:white;border:2px solid #eee3ff;
+  border-radius:25px;padding:9px 13px;
+  font-weight:900;box-shadow:0 4px #e3d4ff
+}
+.progress{
+  height:17px;border-radius:30px;background:white;
+  padding:3px;margin-bottom:23px
+}
+.progress-inner{
+  height:100%;width:0%;border-radius:30px;
+  background:linear-gradient(90deg,#60dbb4,#70b7ff,#aa81ff);
+  transition:width .35s
+}
+.panel{
+  background:#fff;border:4px solid white;border-radius:30px;
+  padding:27px;box-shadow:0 12px #d3c2ed,0 18px 30px #6252a31c
+}
+.center{text-align:center}
+h1{font-size:clamp(29px,6vw,49px);margin:10px 0}
+h2{font-size:clamp(23px,5vw,32px);margin:12px 0}
+p{line-height:1.65}
+.hero{font-size:88px;margin:12px 0;animation:float 2.5s infinite}
+@keyframes float{50%{transform:translateY(-9px)}}
+.subtitle{font-size:18px;font-weight:900;color:#78679b}
+.btn{
+  background:var(--purple);border:0;color:white;
+  padding:15px 23px;border-radius:19px;
+  font-size:16px;font-weight:900;box-shadow:0 6px #5832b0;
+  margin:4px;min-height:50px
+}
+.btn:active{transform:translateY(5px);box-shadow:0 1px #5832b0}
+.btn:disabled{opacity:.5;cursor:default}
+.pink{background:var(--pink);box-shadow:0 6px #d6448d}
+.mint{background:#19bc96;box-shadow:0 6px #078b6c}
+.light{background:#efe7ff;color:#7553bd;box-shadow:0 5px #d9c9f9}
+.chapters{
+  display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:23px 0
+}
+.chapter{
+  border:3px solid #eadfff;border-radius:22px;
+  padding:18px 10px;background:#faf7ff;text-align:center
+}
+.chapter .emoji{font-size:45px}
+.chapter strong{display:block;margin:10px 0;font-size:17px}
+.chapter small{font-weight:800;color:#85799e}
+.chapter.done{background:#e8fff4;border-color:#57d7aa}
+.chapter.current{background:#f0e7ff;border-color:#a77cff}
+.tag{
+  display:inline-block;background:#eee5ff;color:#7951d5;
+  padding:8px 15px;border-radius:25px;font-size:13px;font-weight:900
+}
+.scene{
+  background:linear-gradient(135deg,#fff0b6,#ffd6eb,#d7d0ff);
+  min-height:205px;border:3px solid #f7eaff;border-radius:25px;
+  display:flex;justify-content:center;align-items:center;
+  margin:18px 0;position:relative;overflow:hidden
+}
+.scene:before{
+  content:"✦ ✧ ✦";position:absolute;top:12px;left:22px;
+  color:white;font-size:29px
+}
+.scene .art{font-size:clamp(65px,15vw,105px);animation:float 2.5s infinite}
+.speech{
+  background:#f6f0ff;border:2px solid #e6d7ff;
+  border-radius:20px;padding:20px;text-align:center;
+  font-size:clamp(17px,3vw,22px);font-weight:900;
+  line-height:1.65;margin:16px 0
+}
+.target{color:#7748e2}
+.context{
+  background:#fff5d8;border-radius:15px;
+  padding:13px 15px;font-size:14px;font-weight:800;color:#84601e
+}
+.question{font-size:20px;font-weight:900;margin:23px 0 14px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{
+  background:white;border:3px solid #e9dffc;border-radius:20px;
+  min-height:115px;padding:14px 9px;
+  font-size:16px;font-weight:900;color:var(--ink);
+  box-shadow:0 5px #e9dffc
+}
+.choice:hover:not(:disabled){background:#f8f3ff}
+.choice:disabled{cursor:default}
+.choice .icon{font-size:39px;display:block;margin-bottom:9px}
+.choice.correct{background:#e0fff0;border-color:#39ca98;box-shadow:0 5px #27a87a}
+.choice.wrong{background:#ffe8ee;border-color:#ff93ae;box-shadow:0 5px #ee7995}
+.feedback{
+  background:#e9fff4;border:2px solid #8ce5b8;
+  border-radius:17px;padding:15px;margin-top:17px;font-weight:800
+}
+.feedback.error{background:#fff0f3;border-color:#ffb1c4}
+.controls{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+.controls .btn{font-size:14px;padding:11px 14px}
+.reward{font-size:85px;margin:18px 0}
+.word-cloud{
+  display:flex;justify-content:center;flex-wrap:wrap;
+  gap:9px;margin:22px 0
+}
+.chip{
+  background:#f0e9ff;color:#7551c5;
+  padding:10px 14px;border-radius:25px;font-weight:900
+}
+.note{text-align:center;color:#877a9f;font-size:13px;font-weight:800;margin-top:28px}
+@media(max-width:520px){
+  .panel{padding:19px 14px}
+  .chapter{padding:14px 7px}
+  .chapter strong{font-size:14px}
+  .choices{gap:8px}
+  .choice{font-size:14px;min-height:108px}
+  .top{justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="top">
+    <div class="logo">🌈 WORD QUEST!</div>
+    <div class="stats">
+      <span class="pill" id="stars">⭐ 0</span>
+      <span class="pill" id="gems">💎 0</span>
+      <span class="pill" id="count">🗺️ 0/20</span>
+    </div>
+  </header>
+  <div class="progress"><div class="progress-inner" id="bar"></div></div>
+  <section id="screen" aria-live="polite"></section>
+  <div class="note">✨ READ · LISTEN · CHOOSE · EXPLORE ✨</div>
+</main>
+
+<script>
+"use strict";
+
+const chapters=[
+  {title:"마법 학교 탐험",emoji:"🏰",desc:"숨겨진 교실을 찾아라!"},
+  {title:"신비한 숲",emoji:"🌳",desc:"숲속 친구들을 구해라!"},
+  {title:"마법 연구실",emoji:"🧪",desc:"마법 물약을 완성해라!"},
+  {title:"드래곤의 성",emoji:"🐉",desc:"수수께끼를 풀고 탈출하라!"}
+];
+
+const missions=[
+  {
+    word:"arrive",scene:"🏰🚍",chapter:0,
+    line:"The magic bus will <b>arrive</b> at the school soon!",
+    context:"마법 버스가 학교로 향하고 있어요. 친구들이 학교 앞에서 기다려요.",
+    question:"버스가 학교에 도착하면 어떤 장면이 펼쳐질까요?",
+    options:[["🏰🚍","버스가 학교 앞에 멈춰요"],["🚀🌕","버스가 달로 날아가요"]],
+    answer:0,success:"We arrived at the magic school!",
+    hint:"버스가 이동을 마치고 학교 앞에 왔어요."
+  },
+  {
+    word:"enter",scene:"🚪🏫",chapter:0,
+    line:"The door is open. Let's <b>enter</b> the classroom!",
+    context:"교실 문이 열렸어요. 안에서 마법 소리가 들려요.",
+    question:"친구가 다음에 할 행동은?",
+    options:[["🚪➡️🏫","교실 안으로 들어가기"],["🏃💨","학교 밖으로 달리기"]],
+    answer:0,success:"We entered the classroom!",
+    hint:"문이 열려 있고 친구가 교실 안으로 가자고 해요."
+  },
+  {
+    word:"follow",scene:"🧙‍♀️🐾",chapter:0,
+    line:"The wizard knows the way. <b>Follow</b> her!",
+    context:"마법사가 앞장서서 비밀 통로로 걸어가요.",
+    question:"어떻게 해야 비밀 통로를 찾을까요?",
+    options:[["🚶‍♀️➡️🧙‍♀️","마법사 뒤를 따라가기"],["🛏️😴","침대에서 잠자기"]],
+    answer:0,success:"We followed the wizard!",
+    hint:"길을 아는 마법사가 앞에서 걷고 있어요."
+  },
+  {
+    word:"find",scene:"🗝️🔎",chapter:0,
+    line:"We need to <b>find</b> the golden key!",
+    context:"문이 잠겨 있어요. 황금 열쇠가 책상 아래에서 반짝여요.",
+    question:"문을 열기 위해 무엇을 해야 할까요?",
+    options:[["🔎🗝️","숨겨진 열쇠 찾아내기"],["🧹🫧","바닥만 청소하기"]],
+    answer:0,success:"We found the golden key!",
+    hint:"열쇠가 어디 있는지 살펴보세요."
+  },
+  {
+    word:"choose",scene:"🚪🚪",chapter:0,
+    line:"There are two doors. <b>Choose</b> the blue one!",
+    context:"파란 문과 빨간 문이 있어요. 마법사가 파란 문을 가리켜요.",
+    question:"어느 문으로 갈까요?",
+    options:[["🔴🚪","빨간 문"],["🔵🚪","파란 문"]],
+    answer:1,success:"Great! You chose the blue door!",
+    hint:"마법사가 원하는 문은 파란색이에요."
+  },
+  {
+    word:"collect",scene:"💎🌲",chapter:1,
+    line:"We need five gems. Let's <b>collect</b> them!",
+    context:"숲속 곳곳에 보석이 흩어져 있어요.",
+    question:"보석 다섯 개를 얻으려면?",
+    options:[["💎💎💎","보석을 하나씩 모으기"],["🪨💥","보석을 모두 부수기"]],
+    answer:0,success:"We collected the magic gems!",
+    hint:"흩어진 보석을 한곳에 가져와야 해요."
+  },
+  {
+    word:"carry",scene:"🐰📦",chapter:1,
+    line:"This box is heavy. Can you <b>carry</b> it?",
+    context:"토끼가 무거운 상자를 옮기지 못해 힘들어해요.",
+    question:"토끼를 어떻게 도와줄까요?",
+    options:[["📦💪","상자를 들어 옮겨 주기"],["🎨🖌️","상자에 그림 그리기"]],
+    answer:0,success:"You carried the box for the rabbit!",
+    hint:"상자를 다른 장소로 옮겨야 해요."
+  },
+  {
+    word:"protect",scene:"🐣☔",chapter:1,
+    line:"It's raining! Let's <b>protect</b> the little bird!",
+    context:"비가 많이 내려요. 아기 새가 비를 맞고 떨고 있어요.",
+    question:"아기 새를 위해 어떤 행동을 할까요?",
+    options:[["☂️🐣","우산으로 새를 지켜 주기"],["💦🐣","새에게 물 뿌리기"]],
+    answer:0,success:"You protected the little bird!",
+    hint:"아기 새가 비를 맞지 않게 해 주세요."
+  },
+  {
+    word:"dangerous",scene:"🌋⚠️",chapter:1,
+    line:"Watch out! That bridge is <b>dangerous</b>!",
+    context:"낡은 다리가 흔들리고 아래에는 용암이 흘러요.",
+    question:"어떤 길을 선택해야 할까요?",
+    options:[["🌋🌉","흔들리는 다리로 가기"],["🌼🛤️","안전한 꽃길로 돌아가기"]],
+    answer:1,success:"Good! We avoided the dangerous bridge!",
+    hint:"흔들리는 다리는 건너기 위험해 보여요."
+  },
+  {
+    word:"safe",scene:"🏡🐿️",chapter:1,
+    line:"The storm is coming. This tree house is <b>safe</b>!",
+    context:"폭풍이 몰려와요. 튼튼한 나무집 안에는 비가 들지 않아요.",
+    question:"어디에서 폭풍을 기다릴까요?",
+    options:[["🏡🧸","튼튼한 나무집 안"],["🌪️🌳","폭풍이 부는 들판"]],
+    answer:0,success:"Now everyone is safe!",
+    hint:"폭풍을 피해 몸을 지킬 수 있는 곳을 고르세요."
+  },
+  {
+    word:"prepare",scene:"🧙📜",chapter:2,
+    line:"The magic show starts soon. Let's <b>prepare</b> everything!",
+    context:"마법 공연이 5분 뒤 시작돼요. 필요한 물건들이 흩어져 있어요.",
+    question:"공연이 시작되기 전에 할 일은?",
+    options:[["😴🛏️","잠자기"],["🎩🪄","마법 도구를 미리 챙기기"]],
+    answer:1,success:"Everything is prepared for the show!",
+    hint:"공연 전에 필요한 도구를 준비해야 해요."
+  },
+  {
+    word:"mix",scene:"🧪🩷💙",chapter:2,
+    line:"Pour the red and blue potions together. <b>Mix</b> them!",
+    context:"빨간 물약과 파란 물약을 한 병에 넣었어요.",
+    question:"다음에 할 행동은?",
+    options:[["🥄🧪","물약을 잘 저어 섞기"],["🗑️🧪","물약을 버리기"]],
+    answer:0,success:"You mixed the magic potions!",
+    hint:"두 가지 액체를 하나로 섞어야 해요."
+  },
+  {
+    word:"discover",scene:"🗺️✨",chapter:2,
+    line:"Look! We can <b>discover</b> a secret room behind the wall!",
+    context:"벽 뒤에서 이상한 빛이 새어 나와요. 지금껏 몰랐던 방이 있어요.",
+    question:"빛나는 벽 뒤에서 무엇을 해 볼까요?",
+    options:[["🧱🔎","새로운 비밀 방을 찾아내기"],["🙈🚶","아무것도 보지 않고 지나가기"]],
+    answer:0,success:"We discovered a secret room!",
+    hint:"아직 몰랐던 새로운 장소를 찾아보세요."
+  },
+  {
+    word:"different",scene:"🐸🦄",chapter:2,
+    line:"These animals are <b>different</b>. One is a frog and one is a unicorn!",
+    context:"실험대 위에 초록 개구리와 하얀 유니콘이 있어요.",
+    question:"두 동물의 모습은 어떤가요?",
+    options:[["🐸🦄","서로 다르게 생겼어요"],["🐸🐸","모습이 완전히 같아요"]],
+    answer:0,success:"Yes! They are different!",
+    hint:"한 마리는 개구리이고 다른 한 마리는 유니콘이에요."
+  },
+  {
+    word:"important",scene:"📖🌟",chapter:2,
+    line:"This magic book is very <b>important</b>. Don't lose it!",
+    context:"이 책이 없으면 마법의 성으로 가는 문을 열 수 없어요.",
+    question:"마법책을 어떻게 해야 할까요?",
+    options:[["🗑️📖","책을 버리기"],["🎒📖","소중하게 보관하기"]],
+    answer:1,success:"You kept the important book safe!",
+    hint:"마법책은 다음 모험에 꼭 필요해요."
+  },
+  {
+    word:"escape",scene:"🐉🏃",chapter:3,
+    line:"The dragon is coming! We must <b>escape</b> from the castle!",
+    context:"드래곤이 성 안으로 들어와요. 비밀 출구가 열렸어요.",
+    question:"친구들이 지금 해야 할 행동은?",
+    options:[["🚪🏃","비밀 출구로 빠져나가기"],["🪑😴","의자에서 잠들기"]],
+    answer:0,success:"We escaped from the castle!",
+    hint:"드래곤을 피해 성 밖으로 나가야 해요."
+  },
+  {
+    word:"solve",scene:"🧩🔐",chapter:3,
+    line:"The door is locked. Let's <b>solve</b> this puzzle!",
+    context:"문에 숫자 퍼즐이 있어요. 정답을 맞히면 문이 열려요.",
+    question:"2 + 3 = ?",
+    options:[["🔢 5","5를 입력하기"],["🔢 8","8을 입력하기"]],
+    answer:0,success:"We solved the puzzle!",
+    hint:"두 개와 세 개를 더해 보세요."
+  },
+  {
+    word:"decide",scene:"🛤️🤔",chapter:3,
+    line:"We have two paths. We must <b>decide</b> which way to go!",
+    context:"왼쪽에는 용암, 오른쪽에는 안전한 다리가 있어요.",
+    question:"어떤 길로 가기로 결정할까요?",
+    options:[["🌋⬅️","용암이 있는 왼쪽"],["🌉➡️","안전한 오른쪽"]],
+    answer:1,success:"We decided to take the safe path!",
+    hint:"두 가지 중 더 안전한 길을 골라야 해요."
+  },
+  {
+    word:"brave",scene:"🦁🛡️",chapter:3,
+    line:"The little knight is <b>brave</b>. He helps his friends even when he's scared!",
+    context:"작은 기사가 무섭지만 친구를 구하려고 앞으로 나서요.",
+    question:"용감한 기사는 어떤 행동을 할까요?",
+    options:[["🛡️🐰","두려워도 친구를 도와주기"],["🙈🏃","친구를 두고 혼자 숨기"]],
+    answer:0,success:"You are brave, too!",
+    hint:"무서운 상황에서도 친구를 돕는 모습을 떠올려 보세요."
+  },
+  {
+    word:"finally",scene:"🏆🎉",chapter:3,
+    line:"We passed every challenge. <b>Finally</b>, we are free!",
+    context:"모든 미션을 끝냈어요. 이제 마지막 문이 열리고 있어요.",
+    question:"이야기의 마지막에는 어떤 일이 일어날까요?",
+    options:[["🔄🏰","모험을 처음부터 다시 시작해요"],["🎊🏆","드디어 탈출에 성공해요"]],
+    answer:1,success:"Finally, we finished our adventure!",
+    hint:"길었던 모험이 모두 끝나는 순간이에요."
+  }
+];
+
+const reviewItems=[
+  {
+    text:"The rabbit can't carry the heavy box. What will you do?",
+    options:[["📦💪","Help the rabbit move the box"],["🎈🎉","Have a party"]],
+    answer:0,words:["carry"]
+  },
+  {
+    text:"The bridge is dangerous. What is the best choice?",
+    options:[["🌋🌉","Cross the broken bridge"],["🌼🛤️","Find a safe path"]],
+    answer:1,words:["dangerous","safe","find"]
+  },
+  {
+    text:"The show begins in five minutes. What should we do?",
+    options:[["🎩🪄","Prepare our magic tools"],["🛏️😴","Go to sleep"]],
+    answer:0,words:["prepare"]
+  },
+  {
+    text:"We need to collect three stars. What should we do?",
+    options:[["⭐🌟⭐","Pick up the stars"],["🗑️⭐","Throw the stars away"]],
+    answer:0,words:["collect"]
+  },
+  {
+    text:"A dragon is behind us! We must escape!",
+    options:[["🚪🏃","Run to the exit"],["🍰🍽️","Eat a cake"]],
+    answer:0,words:["escape"]
+  },
+  {
+    text:"The wizard says, 'Follow me to the secret door!'",
+    options:[["🧙‍♀️🚶","Walk behind the wizard"],["🛏️😴","Stay and sleep"]],
+    answer:0,words:["follow"]
+  },
+  {
+    text:"We found two different potions. What should we do next?",
+    options:[["🥄🧪","Mix the potions"],["🧊📦","Hide both potions"]],
+    answer:0,words:["different","mix"]
+  },
+  {
+    text:"The little bird needs help. Be brave and protect it!",
+    options:[["☂️🐣","Keep the bird out of the rain"],["🌧️🐣","Leave the bird in the storm"]],
+    answer:0,words:["brave","protect"]
+  },
+  {
+    text:"Choose a door, solve the puzzle, and enter the room!",
+    options:[["🔐🧩🚪","Open the puzzle door"],["🌳😴","Sleep under a tree"]],
+    answer:0,words:["choose","solve","enter"]
+  },
+  {
+    text:"We finally arrive at the treasure room. What do we discover?",
+    options:[["💎🏆","A secret treasure"],["🚌🏫","A school bus"]],
+    answer:0,words:["finally","arrive","discover"]
+  }
+];
+
+const KEY="wordQuestMagicV3";
+
+function freshState(){
+  return {
+    index:0,
+    stars:0,
+    gems:0,
+    mistakes:0,
+    completed:false,
+    reviewDone:false,
+    reviewScore:0
+  };
+}
+
+function loadState(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(KEY));
+    if(!raw || typeof raw.index!=="number")return freshState();
+    return {
+      ...freshState(),
+      ...raw,
+      index:Math.min(20,Math.max(0,raw.index))
+    };
+  }catch(e){return freshState();}
+}
+
+let state=loadState();
+let phase="home";
+let answered=false;
+let attempts=0;
+let reviewIndex=0;
+let reviewScore=0;
+
+const screen=document.getElementById("screen");
+
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}
+  catch(e){}
+}
+
+function updateStats(){
+  document.getElementById("stars").textContent="⭐ "+state.stars;
+  document.getElementById("gems").textContent="💎 "+state.gems;
+  document.getElementById("count").textContent="🗺️ "+state.index+"/20";
+  document.getElementById("bar").style.width=(state.index/20*100)+"%";
+}
+
+function speak(text){
+  if(!("speechSynthesis" in window)){
+    alert("이 브라우저에서는 음성 재생을 지원하지 않아요.");
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter=new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g,""));
+  utter.lang="en-US";
+  utter.rate=.82;
+  utter.pitch=1.1;
+  const voices=speechSynthesis.getVoices();
+  const english=voices.find(v=>v.lang==="en-US") ||
+                voices.find(v=>v.lang.startsWith("en"));
+  if(english)utter.voice=english;
+  speechSynthesis.speak(utter);
+}
+
+function panel(html){
+  screen.innerHTML='<div class="panel">'+html+'</div>';
+  updateStats();
+}
+
+function home(){
+  phase="home";
+  const list=chapters.map((c,i)=>{
+    const done=state.index>=(i+1)*5;
+    const current=Math.floor(Math.min(state.index,19)/5)===i &&
+                  state.index<20;
+    return `
+      <div class="chapter ${done?"done":current?"current":""}">
+        <div class="emoji">${c.emoji}</div>
+        <strong>LEVEL ${i+1}<br>${c.title}</strong>
+        <small>${done?"✅ CLEAR!":current?"🎯 PLAY NOW":"🔒 COMING SOON"}</small>
+      </div>`;
+  }).join("");
+
+  panel(`
+    <div class="center">
+      <div class="hero">🧙‍♀️🏰✨</div>
+      <div class="tag">20 MAGIC WORDS · 4 WORLDS</div>
+      <h1>WORD QUEST!</h1>
+      <div class="subtitle">마법 학교 대탈출!</div>
+      <p>
+        마법 학교에 갇힌 친구들을 구해 줘!<br>
+        영어를 듣고, 이야기를 읽고, 행동을 선택하면<br>
+        신비한 마법의 문이 하나씩 열려!
+      </p>
+    </div>
+    <div class="chapters">${list}</div>
+    <div class="center">
+      <button class="btn pink" onclick="startGame()">
+        ${state.index===20?"🏆 모험 결과 보기":state.index>0?"🚀 이어서 모험하기":"🚀 모험 시작!"}
+      </button>
+      <button class="btn light" onclick="resetGame()">🔄 처음부터</button>
+    </div>
+  `);
+}
+
+function startGame(){
+  if(state.index>=20){
+    finish();
+  }else{
+    showMission();
+  }
+}
+
+function showMission(){
+  if(state.index>=20){finish();return;}
+  phase="mission";
+  answered=false;
+  attempts=0;
+  const m=missions[state.index];
+  const c=chapters[m.chapter];
+
+  const options=m.options.map((o,i)=>`
+    <button class="choice" id="choice${i}" onclick="pick(${i})">
+      <span class="icon">${o[0]}</span>
+      ${o[1]}
+    </button>
+  `).join("");
+
+  panel(`
+    <div class="center">
+      <div class="tag">${c.emoji} LEVEL ${m.chapter+1} · MISSION ${state.index+1}/20</div>
+      <h2>${c.title}</h2>
+      <p class="subtitle">${c.desc}</p>
+    </div>
+    <div class="scene"><div class="art">${m.scene}</div></div>
+    <div class="speech" id="story">${m.line}</div>
+    <div class="center">
+      <button class="btn light" onclick="readMission()">🔊 영어 듣기</button>
+    </div>
+    <div class="context">💬 상황 단서: ${m.context}</div>
+    <div class="question">🎯 ${m.question}</div>
+    <div class="choices">${options}</div>
+    <div id="feedback"></div>
+    <div class="controls">
+      <button class="btn light" onclick="hint()">💡 힌트</button>
+      <button class="btn light" onclick="home()">🏠 지도</button>
+    </div>
+  `);
+}
+
+function readMission(){
+  speak(missions[state.index].line);
+}
+
+function hint(){
+  if(phase!=="mission"||answered)return;
+  const m=missions[state.index];
+  document.getElementById("feedback").innerHTML=
+    '<div class="feedback">💡 '+m.hint+'</div>';
+}
+
+function pick(choice){
+  if(answered||phase!=="mission")return;
+  const m=missions[state.index];
+  const fb=document.getElementById("feedback");
+
+  if(choice!==m.answer){
+    attempts++;
+    state.mistakes++;
+    save();
+    document.getElementById("choice"+choice).classList.add("wrong");
+    document.getElementById("choice"+choice).disabled=true;
+    fb.innerHTML=`
+      <div class="feedback error">
+        🌈 아직 괜찮아! 이야기를 다시 읽고 다른 행동을 골라 봐.
+        <div style="margin-top:8px">
+          <button class="btn light" onclick="readMission()">🔊 다시 듣기</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  answered=true;
+  document.getElementById("choice"+choice).classList.add("correct");
+  document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+
+  const earned=attempts===0?3:1;
+  state.stars+=earned;
+  state.gems+=1;
+  state.index++;
+  save();
+  updateStats();
+
+  const chapterEnd=state.index%5===0;
+  fb.innerHTML=`
+    <div class="feedback">
+      🎉 GREAT JOB! +${earned} ⭐ +1 💎<br>
+      <span style="color:#6851b2">${m.success}</span>
+      <div style="margin-top:14px">
+        <button class="btn mint" onclick="nextMission()">
+          ${state.index===20?"🏆 모험 완료!":chapterEnd?"🎁 챕터 보상 받기":"➡️ 다음 미션"}
+        </button>
+      </div>
+    </div>`;
+  speak(m.success);
+}
+
+function nextMission(){
+  if(state.index%5===0 && state.index>0){
+    chapterReward();
+  }else{
+    showMission();
+  }
+}
+
+function chapterReward(){
+  phase="reward";
+  const chapterNum=state.index/5;
+  const c=chapters[chapterNum-1];
+  const isLast=state.index===20;
+  panel(`
+    <div class="center">
+      <div class="tag">LEVEL ${chapterNum} CLEAR!</div>
+      <div class="reward">${c.emoji}🏆✨</div>
+      <h1>CHAPTER CLEAR!</h1>
+      <h2>${c.title} 성공!</h2>
+      <p class="subtitle">
+        영어 문장을 읽고 멋진 선택을 했어!<br>
+        지금까지 ${state.index}개의 마법 단어를 만났어.
+      </p>
+      <div class="reward">🎁💎🎁</div>
+      <button class="btn pink" onclick="${isLast?"finish()":"showMission()"}">
+        ${isLast?"🏆 최종 결과 보기":"🚀 다음 세계로!"}
+      </button>
+    </div>
+  `);
+}
+
+function finish(){
+  phase="finish";
+  state.completed=true;
+  save();
+  const chips=missions.map(m=>
+    '<span class="chip">'+m.word+'</span>'
+  ).join("");
+
+  panel(`
+    <div class="center">
+      <div class="tag">ALL MISSIONS COMPLETE</div>
+      <div class="reward">🏆👑🌈</div>
+      <h1>YOU DID IT!</h1>
+      <h2>마법 학교 대탈출 성공!</h2>
+      <p class="subtitle">
+        네가 만난 마법 단어 20개가 모였어!<br>
+        이제 새로운 모험에서도 이 단어들을 알아볼 수 있을까?
+      </p>
+      <div class="word-cloud">${chips}</div>
+      <p>⭐ 획득한 별 ${state.stars}개 · 💎 보석 ${state.gems}개</p>
+      <button class="btn pink" onclick="startReview()">🎮 보너스 모험 시작!</button>
+      <button class="btn light" onclick="home()">🏠 월드맵</button>
+    </div>
+  `);
+}
+
+function startReview(){
+  reviewIndex=0;
+  reviewScore=0;
+  showReview();
+}
+
+function showReview(){
+  phase="review";
+  if(reviewIndex>=reviewItems.length){
+    finishReview();
+    return;
+  }
+  const r=reviewItems[reviewIndex];
+  panel(`
+    <div class="center">
+      <div class="tag">BONUS QUEST · ${reviewIndex+1}/10</div>
+      <div class="hero">🎲🧙‍♀️✨</div>
+      <h2>마법의 마지막 시험!</h2>
+      <p>이번에는 영어 이야기를 읽고 바로 행동해 봐!</p>
+    </div>
+    <div class="speech">${r.text}</div>
+    <div class="center">
+      <button class="btn light" onclick="speakReview()">🔊 듣기</button>
+    </div>
+    <div class="question">🎯 What will you do?</div>
+    <div class="choices">
+      ${r.options.map((o,i)=>`
+        <button class="choice" id="reviewChoice${i}" onclick="pickReview(${i})">
+          <span class="icon">${o[0]}</span>${o[1]}
+        </button>`).join("")}
+    </div>
+    <div id="feedback"></div>
+  `);
+}
+
+function speakReview(){
+  speak(reviewItems[reviewIndex].text);
+}
+
+function pickReview(choice){
+  if(phase!=="review")return;
+  const r=reviewItems[reviewIndex];
+  const correct=choice===r.answer;
+  document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+  document.getElementById("reviewChoice"+choice)
+    .classList.add(correct?"correct":"wrong");
+  document.getElementById("reviewChoice"+r.answer)
+    .classList.add("correct");
+
+  if(correct)reviewScore++;
+
+  document.getElementById("feedback").innerHTML=`
+    <div class="feedback ${correct?"":"error"}">
+      ${correct?"🌟 Fantastic!":"💡 다음에는 더 잘할 수 있어!"}
+      <br>이 장면에서 다시 만난 단어:
+      <strong>${r.words.join(", ")}</strong>
+      <div style="margin-top:13px">
+        <button class="btn mint" onclick="nextReview()">
+          ➡️ ${reviewIndex===9?"결과 보기":"다음 도전"}
+        </button>
+      </div>
+    </div>`;
+}
+
+function nextReview(){
+  reviewIndex++;
+  showReview();
+}
+
+function finishReview(){
+  phase="reviewEnd";
+  state.reviewDone=true;
+  state.reviewScore=Math.max(state.reviewScore,reviewScore);
+  save();
+  panel(`
+    <div class="center">
+      <div class="reward">🎊🏆🎊</div>
+      <h1>BONUS QUEST CLEAR!</h1>
+      <h2>${reviewScore}/10 미션 성공!</h2>
+      <p class="subtitle">
+        ${reviewScore>=8
+          ?"마법 세계의 영어 탐험가가 되었어!"
+          :"영어 단서를 다시 만나면 더 익숙해질 거야!"}
+      </p>
+      <p>단어를 외우는 대신 영어를 사용해서 모험을 완성했어!</p>
+      <button class="btn pink" onclick="startReview()">🔄 보너스 재도전</button>
+      <button class="btn light" onclick="home()">🏠 월드맵</button>
+    </div>
+  `);
+}
+
+function resetGame(){
+  if(!confirm("모든 별과 진행 기록을 지우고 처음부터 시작할까요?"))
+    return;
+  if("speechSynthesis" in window)speechSynthesis.cancel();
+  state=freshState();
+  save();
+  home();
+}
+
+home();
+</script>
+</body>
+</html>
